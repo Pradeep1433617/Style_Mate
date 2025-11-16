@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Lock, User } from 'lucide-react';
 import logo from '@/assets/consumption.png';
+import { log } from 'console';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -57,36 +58,12 @@ export default function Login() {
     }
 
     try {
-      // const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
-       const methods = await fetchSignInMethodsForEmail(auth, loginEmail);
+       const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+       const methods = await signInWithEmailAndPassword(auth, loginEmail,loginPassword);
+       const user = userCredential.user;
+       const token = await user.getIdToken();
+       localStorage.setItem('authToken', token);
        console.log('sign-in methods for', loginEmail, methods);
-       if (!methods || methods.length === 0) {
-      // No account exists -> user-not-found
-      toast({
-        title: '❌ Account Not Found',
-        description: `No account found with "${loginEmail}". Please sign up.`,
-        variant: 'destructive',
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    // If account exists but does NOT support password sign-in, inform user
-    if (!methods.includes('password')) {
-      // Common values: "google.com", "facebook.com", "twitter.com", "phone"
-      const providerList = methods.join(', ');
-      toast({
-        title: '⚠️ Different Sign-In Method',
-        description: `This email is registered using: ${providerList}. Please sign in using that provider or link a password from account settings.`,
-        variant: 'destructive',
-      });
-      setIsLoading(false);
-      return;
-    }
-      const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
-      const user = userCredential.user;
-      const token = await user.getIdToken();
-      localStorage.setItem('authToken', token);
       
       toast({
         title: '✨ Welcome back!',
@@ -99,60 +76,48 @@ export default function Login() {
       let errorTitle = 'Login Failed';
       let errorMessage = 'Please try again.';
       
-      if (error?.code === 'auth/invalid-credential') {
-      toast({
-        title: '❌ Invalid Credential',
-        description:
-          'The credential provided is not valid or has expired. If you signed up with Google or another provider, please use that provider to sign in.',
-        variant: 'destructive',
-      });
-    } else {
-      // Existing switch-style handling (keeps your messages)
-      let errorTitle = 'Login Failed';
-      let errorMessage = 'Please try again.';
-      switch (error.code) {
-        case 'auth/user-not-found':
-          errorTitle = '❌ Account Not Found';
-          errorMessage = `No account found with "${loginEmail}". Please check your email or sign up for a new account.`;
-          break;
-        case 'auth/wrong-password':
-          errorTitle = '❌ Incorrect Password';
-          errorMessage = 'The password you entered is incorrect. Try again or click "Forgot Password" to reset it.';
-          break;
-        case 'auth/invalid-email':
-          errorTitle = '❌ Invalid Email';
-          errorMessage = 'Please enter a valid email address.';
-          break;
-        case 'auth/user-disabled':
-          errorTitle = '❌ Account Disabled';
-          errorMessage = 'This account has been disabled. Please contact support for assistance.';
-          break;
-        case 'auth/too-many-requests':
-          errorTitle = '⚠️ Too Many Login Attempts';
-          errorMessage = 'Access temporarily blocked due to too many failed attempts. Please try again in a few minutes or reset your password.';
-          break;
-        case 'auth/network-request-failed':
-          errorTitle = '🌐 Network Error';
-          errorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
-          break;
-        case 'auth/operation-not-allowed':
-          errorTitle = '⚠️ Service Unavailable';
-          errorMessage = 'Email/password sign-in is currently disabled. Please contact support.';
-          break;
-        default:
-          errorTitle = '❌ Login Error';
-          errorMessage = error.message || 'An unexpected error occurred. Please try again.';
-      }
-      toast({
-        title: errorTitle,
-        description: errorMessage,
-        variant: 'destructive',
-      });
-    } 
-  }finally {
-      setIsLoading(false);
+      // Handle all Firebase auth errors
+    switch (error.code) {
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+      case 'auth/user-not-found':
+        errorTitle = '❌ Invalid Credentials';
+        errorMessage = 'The email or password you entered is incorrect. Please try again or click "Forgot Password" to reset it.';
+        break;
+      case 'auth/invalid-email':
+        errorTitle = '❌ Invalid Email';
+        errorMessage = 'Please enter a valid email address.';
+        break;
+      case 'auth/user-disabled':
+        errorTitle = '❌ Account Disabled';
+        errorMessage = 'This account has been disabled. Please contact support for assistance.';
+        break;
+      case 'auth/too-many-requests':
+        errorTitle = '⚠️ Too Many Login Attempts';
+        errorMessage = 'Access temporarily blocked due to too many failed attempts. Please try again in a few minutes or reset your password.';
+        break;
+      case 'auth/network-request-failed':
+        errorTitle = '🌐 Network Error';
+        errorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
+        break;
+      case 'auth/operation-not-allowed':
+        errorTitle = '⚠️ Service Unavailable';
+        errorMessage = 'Email/password sign-in is currently disabled. Please contact support.';
+        break;
+      default:
+        errorTitle = '❌ Login Error';
+        errorMessage = error.message || 'An unexpected error occurred. Please try again.';
     }
-  };
+    
+    toast({
+      title: errorTitle,
+      description: errorMessage,
+      variant: 'destructive',
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
