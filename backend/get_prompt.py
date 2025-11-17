@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 from get_response_from_ai import get_ai_response_func
 import uvicorn
-
+import os
 app = FastAPI()
 
 received_messages = []
@@ -89,12 +89,13 @@ async def get_messages():
     }
 
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8001))
     print("=" * 60)
-    print("Starting ChicEnsemble Style Assistant Backend Server")
+    print("Starting StyleMate Assistant Backend Server")
     print("AI Model: Google Gemini")
-    print("Server URL: http://localhost:8001")
-    print("API Endpoint: http://localhost:8001/api/chat")
-    print("API Docs: http://localhost:8001/docs")
+    print(f"Server URL: http://0.0.0.0:{port}")
+    print(f"API Endpoint: http://0.0.0.0:{port}/api/chat")
+    print(f"API Docs: http://0.0.0.0:{port}/docs")
     print("=" * 60)
     
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=port)
