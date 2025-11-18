@@ -9,9 +9,22 @@ app = FastAPI()
 
 received_messages = []
 
+# ✅ Updated CORS with your exact frontend URL
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Local development
+    "http://localhost:3000",  # Alternative local
+    "https://style-mate-paxh.onrender.com",  # Backend (for CORS preflight)
+    "https://style-mate-fronted.onrender.com",  # ✅ Your frontend URL
+]
+
+# Get from environment variable if set
+FRONTEND_URL = os.environ.get("FRONTEND_URL")
+if FRONTEND_URL:
+    ALLOWED_ORIGINS.append(FRONTEND_URL)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=ALLOWED_ORIGINS + ["*"],  # Allow all for testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -20,14 +33,18 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return {
-        "message": "ChicEnsemble Style Assistant API is running!",
-        "endpoints": ["/api/chat"],
-        "ai_model": "Google Gemini"
+        "message": " Style Mate API is running!",
+        "endpoints": ["/api/chat" ,"/health", "/messages"],
+        "ai_model": "Google Gemini",    
+        "status": "online",
+        "allowed_origins": ALLOWED_ORIGINS
     }
 
 @app.post("/api/chat")
 async def chat(request: Request):
     try:
+        print(f"📥 Received request from: {request.client.host}")
+        print(f"📥 Origin: {request.headers.get('origin', 'No origin header')}")
         # Try to parse as JSON first
         try:
             data = await request.json()
@@ -102,6 +119,7 @@ if __name__ == "__main__":
     print(f"Server URL: http://0.0.0.0:{port}")
     print(f"API Endpoint: http://0.0.0.0:{port}/api/chat")
     print(f"API Docs: http://0.0.0.0:{port}/docs")
+    print(f" Allowed Origins: {ALLOWED_ORIGINS}")
     print("=" * 60)
     
     uvicorn.run(app, host="0.0.0.0", port=port)
