@@ -256,8 +256,13 @@ const StyleChat = () => {
       console.log('🚀 Sending message to backend:', userMessage);
       console.log('👤 Selected gender:', gender);
       
-      // ✅ Get API URL from environment variable
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
+      // ✅ Hardcode for testing
+      const API_URL = 'https://style-mate-paxh.onrender.com';
+      
+      // ✅ Debug logging
+      console.log('🔗 API_URL being used:', API_URL);
+      console.log('🔍 Env variable:', import.meta.env.VITE_API_URL);
+      console.log('🔍 All env vars:', import.meta.env);
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
