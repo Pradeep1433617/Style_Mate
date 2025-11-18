@@ -254,6 +254,9 @@ const StyleChat = () => {
       console.log('Sending message to backend:', userMessage);
       console.log('Selected gender:', gender);
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
+      console.log('🔗 API URL being used:', API_URL);
+    console.log('🔍 Environment Mode:', import.meta.env.MODE);
+    console.log('🔍 VITE_API_URL from env:', import.meta.env.VITE_API_URL);
       const response = await fetch(`${API_URL}/api/chat`, {
         method: 'POST',
         headers: {
