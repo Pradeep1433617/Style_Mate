@@ -4,6 +4,7 @@ from typing import Optional
 from get_response_from_ai import get_ai_response_func
 import uvicorn
 import os
+import datetime
 app = FastAPI()
 
 received_messages = []
@@ -87,6 +88,11 @@ async def get_messages():
         "total": len(received_messages),
         "messages": received_messages
     }
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint to prevent sleep"""
+    return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8001))

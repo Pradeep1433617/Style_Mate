@@ -258,6 +258,9 @@ const StyleChat = () => {
       
       // ✅ Get API URL from environment variable
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
       
       // ✅ Debug logs to see what's happening
       console.log('🔗 API URL being used:', API_URL);
@@ -275,7 +278,9 @@ const StyleChat = () => {
           message: userMessage,
           gender: gender || 'unisex'
         }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
 
       console.log('✅ Response status:', response.status);
       console.log('✅ Response ok:', response.ok);
