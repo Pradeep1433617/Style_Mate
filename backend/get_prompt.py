@@ -4,7 +4,7 @@ from typing import Optional
 from get_response_from_ai import get_ai_response_func
 import uvicorn
 import os
-import datetime
+from datetime import datetime
 app = FastAPI()
 
 received_messages = []
