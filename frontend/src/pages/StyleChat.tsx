@@ -249,14 +249,23 @@ const StyleChat = () => {
     "Business casual outfit for summer",
   ];
 
+  // Replace lines 246-290 with this COMPLETE function:
+
   const getAIResponse = async (userMessage: string): Promise<string> => {
     try {
-      console.log('Sending message to backend:', userMessage);
-      console.log('Selected gender:', gender);
+      console.log('🚀 Sending message to backend:', userMessage);
+      console.log('👤 Selected gender:', gender);
+      
+      // ✅ Get API URL from environment variable
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
+      
+      // ✅ Debug logs to see what's happening
       console.log('🔗 API URL being used:', API_URL);
-    console.log('🔍 Environment Mode:', import.meta.env.MODE);
-    console.log('🔍 VITE_API_URL from env:', import.meta.env.VITE_API_URL);
+      console.log('🔍 Environment Mode:', import.meta.env.MODE);
+      console.log('🔍 Raw VITE_API_URL:', import.meta.env.VITE_API_URL);
+      console.log('🔍 All env vars:', import.meta.env);
+      
+      // ✅ Make the API call
       const response = await fetch(`${API_URL}/api/chat`, {
         method: 'POST',
         headers: {
@@ -264,29 +273,40 @@ const StyleChat = () => {
         },
         body: JSON.stringify({ 
           message: userMessage,
-          gender: gender
+          gender: gender || 'unisex'
         }),
       });
 
-      console.log('Response status:', response.status);
+      console.log('✅ Response status:', response.status);
+      console.log('✅ Response ok:', response.ok);
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Response error:', errorText);
         throw new Error(`Server responded with status: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('Response data:', data);
+      console.log('✅ Response data:', data);
       
       if (data.status === 'success') {
         return data.response;
       } else {
         throw new Error(data.error || 'Unknown error');
       }
-    } catch (error) {
-      console.error('Error calling backend:', error);
+    } catch (error: any) {
+      console.error('❌ Error calling backend:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
+      
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
+      
       toast({
         title: "Connection Error",
-        description: "Could not connect to the style assistant. Make sure backend is running on port 8001.",
+        description: `Could not connect to ${API_URL}. Please check if the backend is accessible.`,
         variant: "destructive",
       });
       
