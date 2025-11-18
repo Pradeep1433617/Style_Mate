@@ -257,7 +257,7 @@ const StyleChat = () => {
       console.log('👤 Selected gender:', gender);
       
       // ✅ Hardcode for testing
-      const API_URL = 'https://style-mate-paxh.onrender.com';
+      const API_URL = import.meta.env.VITE_API_URL || 'https://style-mate-paxh.onrender.com';
       
       // ✅ Debug logging
       console.log('🔗 API_URL being used:', API_URL);
