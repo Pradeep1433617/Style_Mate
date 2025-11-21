@@ -78,7 +78,7 @@ async def chat(request: Request):
         
         # Get AI response
         
-        ai_response = get_ai_response_func(prompt=message, image=image)
+        ai_response = get_ai_response_func(prompt=message, image=image,gender=gender)
         
         print("AI RESPONSE:")
         print(ai_response)

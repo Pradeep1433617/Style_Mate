@@ -13,7 +13,7 @@ def patched_init(self, *args, **kwargs):
     original_init(self, *args, **kwargs)
 
 httpx.Client.__init__ = patched_init
-def get_ai_response_func(prompt:str, image=None,gender:str="men"):
+def get_ai_response_func(prompt:str, image=None,gender:str="unisex"):
     max_retries=3 
     retry_delay=1
     api_key = os.getenv('GOOGLE_API_KEY')
