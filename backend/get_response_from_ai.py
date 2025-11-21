@@ -14,15 +14,13 @@ def patched_init(self, *args, **kwargs):
 
 httpx.Client.__init__ = patched_init
 def get_ai_response_func(prompt:str, image=None,gender:str="men"):
-    # os.environ['GEMINI_API_KEY'] = "AIzaSyBQuoYcfDxQ8QjS77oU-tlpidHHKjN_CjQ"
-    # The client gets the API key from the environment variable `GEMINI_API_KEY`.
-    
     max_retries=3 
     retry_delay=1
     api_key = os.getenv('GOOGLE_API_KEY')
     if not api_key:
         return "Error: GOOGLE_API_KEY not found in environment variables. Please check your .env file."
-    client = genai.Client(api_key=api_key)
+    #client = genai.Client(api_key=api_key)
+    genai.configure(api_key=api_key)
     for attempt in range(max_retries):
         try:
             if(prompt.lower().strip() not in ["hello", "hi", "hey", "greetings"]):
@@ -113,7 +111,11 @@ def get_ai_response_func(prompt:str, image=None,gender:str="men"):
                 
                 Be friendly, brief, and encouraging."""
             full_prompt = f"{system_instruction}\nUser: {prompt}\nAssistant:"
-            response = client.models.generate_content(
+            model = genai.GenerativeModel(
+                model_name='gemini-2.0-flash-exp',
+                system_instruction=full_prompt
+            )
+            response = model.generate(
                 #model="gemini-2.5-pro",
                 model="gemini-2.5-flash",  
                 contents=full_prompt
