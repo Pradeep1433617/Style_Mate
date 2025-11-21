@@ -112,14 +112,8 @@ def get_ai_response_func(prompt:str, image=None,gender:str="men"):
                 Be friendly, brief, and encouraging."""
             full_prompt = f"{system_instruction}\nUser: {prompt}\nAssistant:"
             model = genai.GenerativeModel(
-                model_name='gemini-2.0-flash-exp',
-                system_instruction=full_prompt
-            )
-            response = model.generate(
-                #model="gemini-2.5-pro",
-                model="gemini-2.5-flash",  
-                contents=full_prompt
-            )
+                model_name='gemini-2.0-flash-exp')
+            response = model.generate(full_prompt)
             print(f"AI Response: {response.text}")
             return response.text 
         
